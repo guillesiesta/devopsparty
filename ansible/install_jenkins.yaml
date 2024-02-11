@@ -1,0 +1,54 @@
+---
+- name: Install Jenkins
+  hosts: mydevops-instance
+  become: true
+  tasks:
+    - name: Update yum cache
+      yum:
+        name: '*'
+        state: latest
+        
+    - name: yum update
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Descargar jenkins.repo
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+        mode: '0644'  # Establece los permisos del archivo
+
+    - name: Importar la clave GPG de Jenkins
+      ansible.builtin.rpm_key:
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+    - name: yum upgrade
+      yum:
+        name: '*'
+        state: latest
+      
+    - name: Install Java (OpenJDK)
+      yum:
+        name: java-17-amazon-corretto 
+        state: present
+
+    - name: Actualizar los paquetes del sistema
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+
+    - name: Install Jenkins
+      package:
+        name: jenkins
+        state: present
+
+    - name: daemon-reload to pick up config changes
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Start Jenkins service
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
