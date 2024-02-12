@@ -1,0 +1,19 @@
+- name: Install Git
+  hosts: mydevops-instance
+  become: true
+  tasks:
+
+    - name: Update yum cache
+      yum:
+        name: '*'
+        state: latest
+        
+    - name: yum update
+      yum:
+        name: '*'
+        state: latest
+        
+    - name: Install Git
+      yum:
+        name: git
+        state: present
